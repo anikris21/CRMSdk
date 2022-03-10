@@ -35,7 +35,7 @@ namespace EngageRM.Plugins
                         entity.Attributes.Contains("emailaddress2") == true ||
                         entity.Attributes.Contains("emailaddress3") == true) &&
                         entity.Attributes.Contains("firstname") == true &&
-                        entity.Attributes.Contains("lastname") != true)
+                        entity.Attributes.Contains("lastname") == true)
                     {
 
                         string email = "";
@@ -51,9 +51,24 @@ namespace EngageRM.Plugins
                         {
                             email = (string)entity.Attributes["emailaddress3"];
                         }
-                        entity["new_passwordhash"] = entity.Attributes["email"] + (string)entity["firstname"] + entity["lastname"];
-                    }
 
+                        string firstname = "";
+                        if (entity.Attributes.Contains("firstname"))
+                        {
+                            firstname = (string)entity["firstname"];
+                        }
+
+                        string lastname = "";
+                        if (entity.Attributes.Contains("lastname"))
+                        {
+                            lastname = (string)entity["lastname"];
+                        }
+
+                        var hash = EngageRMPasswordService.GetPassword(email, firstname, lastname);
+                        tracingService.Trace("passwordhash {0}", hash);
+                        entity.Attributes.Add("new_passwordhash", hash);
+
+                    }
                     tracingService.Trace("Updated contact");
                 }
 
